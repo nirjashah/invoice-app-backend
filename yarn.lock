@@ -142,6 +142,10 @@ bcrypt-pbkdf@^1.0.0:
   dependencies:
     tweetnacl "^0.14.3"
 
+bignumber.js@4.0.4:
+  version "4.0.4"
+  resolved "https://registry.npmjs.intuit.net/b/bignumber.js/_attachments/bignumber.js-4.0.4.tgz#7c40f5abcd2d6623ab7b99682ee7db81b11889a4"
+
 binary-extensions@^1.0.0:
   version "1.10.0"
   resolved "https://registry.npmjs.intuit.net/b/binary-extensions/_attachments/binary-extensions-1.10.0.tgz#9aeb9a6c5e88638aad171e167f5900abe24835d0"
@@ -1151,6 +1155,15 @@ ms@2.0.0:
   version "2.0.0"
   resolved "https://registry.npmjs.intuit.net/m/ms/_attachments/ms-2.0.0.tgz#5608aeadfc00be6c2901df5f9861788de0d597c8"
 
+mysql@^2.15.0:
+  version "2.15.0"
+  resolved "https://registry.npmjs.intuit.net/m/mysql/_attachments/mysql-2.15.0.tgz#ea16841156343e8f2e47fc8985ec41cdd9573b5c"
+  dependencies:
+    bignumber.js "4.0.4"
+    readable-stream "2.3.3"
+    safe-buffer "5.1.1"
+    sqlstring "2.3.0"
+
 nan@^2.3.0:
   version "2.7.0"
   resolved "https://registry.npmjs.intuit.net/n/nan/_attachments/nan-2.7.0.tgz#d95bf721ec877e08db276ed3fc6eb78f9083ad46"
@@ -1417,7 +1430,7 @@ rc@^1.0.1, rc@^1.1.6, rc@^1.1.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
-readable-stream@^2.0.2, readable-stream@^2.0.6, readable-stream@^2.1.4:
+readable-stream@2.3.3, readable-stream@^2.0.2, readable-stream@^2.0.6, readable-stream@^2.1.4:
   version "2.3.3"
   resolved "https://registry.npmjs.intuit.net/r/readable-stream/_attachments/readable-stream-2.3.3.tgz#368f2512d79f9d46fdfc71349ae7878bbc1eb95c"
   dependencies:
@@ -1606,6 +1619,10 @@ split@0.3:
   resolved "https://registry.npmjs.intuit.net/s/split/_attachments/split-0.3.3.tgz#cd0eea5e63a211dfff7eb0f091c4133e2d0dd28f"
   dependencies:
     through "2"
+
+sqlstring@2.3.0:
+  version "2.3.0"
+  resolved "https://registry.npmjs.intuit.net/s/sqlstring/_attachments/sqlstring-2.3.0.tgz#525b8a4fd26d6f71aa61e822a6caf976d31ad2a8"
 
 sshpk@^1.7.0:
   version "1.13.1"
