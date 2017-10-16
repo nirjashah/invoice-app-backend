@@ -30,6 +30,17 @@ connection.query('CREATE DATABASE IF NOT EXISTS invoiceApp', function (err) {
                 if (err) throw err;
                 console.log(' created Invoice table');
             });
+        connection.query('CREATE TABLE IF NOT EXISTS InvoiceLineItem('+
+            'lineItemID INT(11) NOT NULL,'+
+            'PRIMARY KEY(lineItemID),'+
+            'lineDescription VARCHAR(100),'+
+            'lineAmount DECIMAL(10, 2) NOT NULL,'+
+            'invoiceLineFkId INT(11) NOT NULL,'+
+            'CONSTRAINT invoiceLineFkId FOREIGN KEY (invoiceLineFkId) REFERENCES Invoice(invoiceID)'+
+            ');', function (err) {
+                if (err) throw err;
+                console.log(' created InvoiceLineItem table');
+            });
     });
   });
 
