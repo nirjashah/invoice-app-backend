@@ -46,21 +46,25 @@ router.use(bodyParser.json());
 router.post('/', function(req, res, next) {
     //console.log('Posting invoice-', req.body.invoiceToBeStored);
     //res.sendStatus(200);
-    var invoiceID = req.body.invoiceToBeStored.invoiceID;
-    var customerName = req.body.invoiceToBeStored.customerInfo.customerName;
-    var customerEmail = req.body.invoiceToBeStored.customerInfo.customerEmail;
-    var dueDate = req.body.invoiceToBeStored.dueDate;
-
-    console.log('Before inserting: ', invoiceID, customerName, customerEmail, dueDate);
-
-    connection.query('INSERT INTO Invoice' +
-     '(invoiceID, customerName, customerEmail, dueDate) VALUES (' +
-     invoiceID, customerName, customerEmail, dueDate +')',
-    function (err, result) {
-        if (err) throw err;
-        res.sendStatus(200);
-        res.send('Invoice added to database with ID: ' + result.invoiceID);
-    }
+    // var invoiceID = req.body.invoiceToBeStored.invoiceID;
+    // var customerName = req.body.invoiceToBeStored.customerInfo.customerName;
+    // var customerEmail = req.body.invoiceToBeStored.customerInfo.customerEmail;
+    // var dueDate = req.body.invoiceToBeStored.dueDate;
+    //
+    // console.log('Before inserting: ', invoiceID, customerName, customerEmail, dueDate);
+    var payload = {
+              invoiceID: req.body.invoiceToBeStored.invoiceID,
+              customerName: req.body.invoiceToBeStored.customerInfo.customerName,
+              customerEmail: req.body.invoiceToBeStored.customerInfo.customerEmail,
+              dueDate: req.body.invoiceToBeStored.dueDate,
+                    };
+    var data = JSON.stringify(payload);
+    console.log('Before inserting: ', data);
+    connection.query('INSERT INTO Invoice SET ?', data,
+        function (err, result) {
+            if (err) throw err;
+            res.send('User added to database with ID: ' + result.insertId);
+        }
 );
 });
 
