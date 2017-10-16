@@ -47,12 +47,6 @@ connection.query('CREATE DATABASE IF NOT EXISTS invoiceApp', function (err) {
 // parse application/json
 router.use(bodyParser.json());
 
-//Example invoice data
-// { invoiceID: 'INVOICE_hz61pc8jn',
-//   customerInfo: { customerName: 'navya', customerEmail: 'as@gmail.com' },
-//   dueDate: '2017-11-16',
-//   lineItems: [ { lineItemID: 0, lineDescription: 'desc', lineAmount: '45' } ] }
-
 // POST for invoice data. Update MySQL database
 router.post('/', function(req, res, next) {
     //console.log('Posting invoice-', req.body.invoiceToBeStored);
@@ -62,7 +56,7 @@ router.post('/', function(req, res, next) {
     var customerEmail = req.body.invoiceToBeStored.customerInfo.customerEmail;
     var dueDate = req.body.invoiceToBeStored.dueDate;
 
-    console.log('Before inserting: ', customerName, customerEmail, dueDate);
+    console.log('Before inserting in Invoice table: ', customerName, customerEmail, dueDate);
 
     var post  = {
                   customerName: customerName,
@@ -72,18 +66,33 @@ router.post('/', function(req, res, next) {
     var query = connection.query('INSERT INTO Invoice SET ?', post,
         function(err, result) {
           if (err) throw err;
-          res.send('User added to database with ID: ' + result.insertId);
-        });
-    console.log(query.sql);
+          res.send('Invoice added to database with ID: ' + result.insertId);
+          var lineItems = req.body.invoiceToBeStored.lineItems;
+          lineItems.forEach(function (lineItem) {
+              var lineItemID = lineItem.lineItemID;
+              var lineDescription = lineItem.lineDescription;
+              var lineAmount = lineItem.lineAmount;
+              var invoiceLineFkId = result.insertId;
+              console.log('Before inserting line item: ', lineItemID, lineDescription, lineAmount);
+              var post = {
+                          lineItemID: lineItemID,
+                          lineDescription: lineDescription,
+                          lineAmount: lineAmount,
+                          invoiceLineFkId: invoiceLineFkId
+                        };
 
-    /*connection.query('INSERT INTO Invoice SET customerName='+ `customerName` +
-    ',customerEmail='+ `customerEmail` +
-    ',dueDate='+ `dueDate`,
-        function (err, result) {
-            if (err) throw err;
-            res.send('User added to database with ID: ' + result.insertId);
-        }
-);*/
+              var query = connection.query('INSERT INTO InvoiceLineItem SET ?', post,
+                  function(err, result) {
+                    if (err) throw err;
+                    res.send('Invoice line item added to database with ID: ' + result.insertId);
+                  });
+              console.log(query.sql);
+
+          });
+        });
+    console.log("Invoice table query: ",query.sql);
+
+
 });
 
 module.exports = router;
