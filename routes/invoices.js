@@ -32,7 +32,6 @@ connection.query('CREATE DATABASE IF NOT EXISTS invoiceApp', function (err) {
             });
         connection.query('CREATE TABLE IF NOT EXISTS InvoiceLineItem('+
             'lineItemID INT(11) NOT NULL,'+
-            'PRIMARY KEY(lineItemID),'+
             'lineDescription VARCHAR(100),'+
             'lineAmount DECIMAL(10, 2) NOT NULL,'+
             'invoiceLineFkId INT(11) NOT NULL,'+
@@ -47,52 +46,91 @@ connection.query('CREATE DATABASE IF NOT EXISTS invoiceApp', function (err) {
 // parse application/json
 router.use(bodyParser.json());
 
-// POST for invoice data. Update MySQL database
+// POST for invoice data. Create entry in MySQL database
 router.post('/', function(req, res, next) {
-    //console.log('Posting invoice-', req.body.invoiceToBeStored);
-    //res.sendStatus(200);
-    //var invoiceID = req.body.invoiceToBeStored.invoiceID;
     var customerName = req.body.invoiceToBeStored.customerInfo.customerName;
     var customerEmail = req.body.invoiceToBeStored.customerInfo.customerEmail;
     var dueDate = req.body.invoiceToBeStored.dueDate;
-
+    var lineItems = req.body.invoiceToBeStored.lineItems;
     console.log('Before inserting in Invoice table: ', customerName, customerEmail, dueDate);
-
     var post  = {
                   customerName: customerName,
                   customerEmail: customerEmail,
                   dueDate: dueDate
                 };
-    var query = connection.query('INSERT INTO Invoice SET ?', post,
-        function(err, result) {
-          if (err) throw err;
-          res.send('Invoice added to database with ID: ' + result.insertId);
-          var lineItems = req.body.invoiceToBeStored.lineItems;
-          lineItems.forEach(function (lineItem) {
-              var lineItemID = lineItem.lineItemID;
-              var lineDescription = lineItem.lineDescription;
-              var lineAmount = lineItem.lineAmount;
-              var invoiceLineFkId = result.insertId;
-              console.log('Before inserting line item: ', lineItemID, lineDescription, lineAmount);
-              var post = {
-                          lineItemID: lineItemID,
-                          lineDescription: lineDescription,
-                          lineAmount: lineAmount,
-                          invoiceLineFkId: invoiceLineFkId
-                        };
-
-              var query = connection.query('INSERT INTO InvoiceLineItem SET ?', post,
-                  function(err, result) {
-                    if (err) throw err;
-                    res.send('Invoice line item added to database with ID: ' + result.insertId);
-                  });
-              console.log(query.sql);
-
-          });
-        });
-    console.log("Invoice table query: ",query.sql);
-
+    createInvoiceWithCustomerDetails(post).then(function(data){
+      console.log("Data: ", data);
+      console.log("lineItems: ", lineItems);
+      return createInvoiceLineItem(data, lineItems);
+    }).then(function(status){
+        res.sendStatus(status)
+    }).catch(function (error) {
+    throw error;
+  });
 
 });
+
+function createInvoiceWithCustomerDetails(post) {
+    return new Promise((resolve, reject) => {
+        var query = connection.query('INSERT INTO Invoice SET ?', post,
+            function(err, result) {
+              if (err) reject(err);
+              //res.send('Invoice added to database with ID: ' + result.insertId);
+              resolve(result.insertId);
+            });
+        console.log("Invoice table query: ",query.sql);
+    });
+};
+
+function createInvoiceLineItem(invoiceIDfk, lineItems) {
+    return new Promise((resolve, reject) => {
+
+      lineItems.forEach(function (lineItem) {
+          var lineItemID = lineItem.lineItemID;
+          var lineDescription = lineItem.lineDescription;
+          var lineAmount = lineItem.lineAmount;
+          var invoiceLineFkId = invoiceIDfk;
+          console.log('Before inserting line item: ', lineItemID, lineDescription, lineAmount);
+          var post = {
+                      lineItemID: lineItemID,
+                      lineDescription: lineDescription,
+                      lineAmount: lineAmount,
+                      invoiceLineFkId: invoiceLineFkId
+                    };
+
+          var query = connection.query('INSERT INTO InvoiceLineItem SET ?', post,
+              function(err, result) {
+                if (err) reject(err);
+                resolve(200);
+                //res.send('Invoice line item added to database with ID: ' + result.insertId);
+              });
+          console.log("Invoice line item query: ", query.sql);
+    });
+  });
+};
+
+//2nd query
+// var lineItems = req.body.invoiceToBeStored.lineItems;
+// lineItems.forEach(function (lineItem) {
+//     var lineItemID = lineItem.lineItemID;
+//     var lineDescription = lineItem.lineDescription;
+//     var lineAmount = lineItem.lineAmount;
+//     var invoiceLineFkId = result.insertId;
+//     console.log('Before inserting line item: ', lineItemID, lineDescription, lineAmount);
+//     var post = {
+//                 lineItemID: lineItemID,
+//                 lineDescription: lineDescription,
+//                 lineAmount: lineAmount,
+//                 invoiceLineFkId: invoiceLineFkId
+//               };
+//
+//     var query = connection.query('INSERT INTO InvoiceLineItem SET ?', post,
+//         function(err, result) {
+//           if (err) throw err;
+//           res.send('Invoice line item added to database with ID: ' + result.insertId);
+//         });
+//     console.log(query.sql);
+//
+// });
 
 module.exports = router;
