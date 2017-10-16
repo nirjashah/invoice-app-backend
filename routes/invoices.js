@@ -21,7 +21,7 @@ connection.query('CREATE DATABASE IF NOT EXISTS invoiceApp', function (err) {
         if (err) throw err;
         console.log('using invoiceApp db');
         connection.query('CREATE TABLE IF NOT EXISTS Invoice('+
-            'invoiceID VARCHAR(30) NOT NULL,'+
+            'invoiceID INT(11) NOT NULL AUTO_INCREMENT,'+
             'PRIMARY KEY(invoiceID),'+
             'customerName VARCHAR(30) NOT NULL,'+
             'customerEmail VARCHAR(30) NOT NULL,'+
@@ -46,26 +46,33 @@ router.use(bodyParser.json());
 router.post('/', function(req, res, next) {
     //console.log('Posting invoice-', req.body.invoiceToBeStored);
     //res.sendStatus(200);
-    // var invoiceID = req.body.invoiceToBeStored.invoiceID;
-    // var customerName = req.body.invoiceToBeStored.customerInfo.customerName;
-    // var customerEmail = req.body.invoiceToBeStored.customerInfo.customerEmail;
-    // var dueDate = req.body.invoiceToBeStored.dueDate;
-    //
-    // console.log('Before inserting: ', invoiceID, customerName, customerEmail, dueDate);
-    var payload = {
-              invoiceID: req.body.invoiceToBeStored.invoiceID,
-              customerName: req.body.invoiceToBeStored.customerInfo.customerName,
-              customerEmail: req.body.invoiceToBeStored.customerInfo.customerEmail,
-              dueDate: req.body.invoiceToBeStored.dueDate,
-                    };
-    var data = JSON.stringify(payload);
-    console.log('Before inserting: ', data);
-    connection.query('INSERT INTO Invoice SET ?', data,
+    //var invoiceID = req.body.invoiceToBeStored.invoiceID;
+    var customerName = req.body.invoiceToBeStored.customerInfo.customerName;
+    var customerEmail = req.body.invoiceToBeStored.customerInfo.customerEmail;
+    var dueDate = req.body.invoiceToBeStored.dueDate;
+
+    console.log('Before inserting: ', customerName, customerEmail, dueDate);
+
+    var post  = {
+                  customerName: customerName,
+                  customerEmail: customerEmail,
+                  dueDate: dueDate
+                };
+    var query = connection.query('INSERT INTO Invoice SET ?', post,
+        function(err, result) {
+          if (err) throw err;
+          res.send('User added to database with ID: ' + result.insertId);
+        });
+    console.log(query.sql);
+
+    /*connection.query('INSERT INTO Invoice SET customerName='+ `customerName` +
+    ',customerEmail='+ `customerEmail` +
+    ',dueDate='+ `dueDate`,
         function (err, result) {
             if (err) throw err;
             res.send('User added to database with ID: ' + result.insertId);
         }
-);
+);*/
 });
 
 module.exports = router;
