@@ -70,6 +70,7 @@ router.post('/', function(req, res, next) {
 
 });
 
+// First query to inset data in Invoice table
 function createInvoiceWithCustomerDetails(post) {
     return new Promise((resolve, reject) => {
         var query = connection.query('INSERT INTO Invoice SET ?', post,
@@ -82,6 +83,7 @@ function createInvoiceWithCustomerDetails(post) {
     });
 };
 
+// Second query to inset data in InvoiceLineItem table
 function createInvoiceLineItem(invoiceIDfk, lineItems) {
     return new Promise((resolve, reject) => {
 
@@ -108,29 +110,5 @@ function createInvoiceLineItem(invoiceIDfk, lineItems) {
     });
   });
 };
-
-//2nd query
-// var lineItems = req.body.invoiceToBeStored.lineItems;
-// lineItems.forEach(function (lineItem) {
-//     var lineItemID = lineItem.lineItemID;
-//     var lineDescription = lineItem.lineDescription;
-//     var lineAmount = lineItem.lineAmount;
-//     var invoiceLineFkId = result.insertId;
-//     console.log('Before inserting line item: ', lineItemID, lineDescription, lineAmount);
-//     var post = {
-//                 lineItemID: lineItemID,
-//                 lineDescription: lineDescription,
-//                 lineAmount: lineAmount,
-//                 invoiceLineFkId: invoiceLineFkId
-//               };
-//
-//     var query = connection.query('INSERT INTO InvoiceLineItem SET ?', post,
-//         function(err, result) {
-//           if (err) throw err;
-//           res.send('Invoice line item added to database with ID: ' + result.insertId);
-//         });
-//     console.log(query.sql);
-//
-// });
 
 module.exports = router;
