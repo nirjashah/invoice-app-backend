@@ -70,6 +70,24 @@ router.post('/', function(req, res, next) {
 
 });
 
+//GET invoice data
+router.get('/', function(req, res){
+    var data ={
+      "Data": ""
+    };
+    var query = connection.query('SELECT * from InvoiceLineItem',
+            function(err, rows, fields) {
+              if(rows.length != 0){
+                data["Data"] = rows;
+                res.json(data);
+            }else{
+                data["Data"] = 'No data Found..';
+                res.json(data);
+            }
+        });
+    console.log("Query to get all invoices: ", query.sql);
+});
+
 // First query to inset data in Invoice table
 function createInvoiceWithCustomerDetails(post) {
     return new Promise((resolve, reject) => {
