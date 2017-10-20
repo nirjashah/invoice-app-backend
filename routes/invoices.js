@@ -58,10 +58,10 @@ router.post('/', function(req, res, next) {
                   customerEmail: customerEmail,
                   dueDate: dueDate
                 };
-    createInvoiceWithCustomerDetails(post).then(function(data){
-      console.log("Data: ", data);
+    createInvoiceWithCustomerDetails(post).then(function(invoiceId){
+      console.log("Invoice ID generated: ", invoiceId);
       console.log("lineItems: ", lineItems);
-      return createInvoiceLineItem(data, lineItems);
+      return createInvoiceLineItem(invoiceId, lineItems);
     }).then(function(status){
         res.sendStatus(status)
     }).catch(function (error) {
@@ -92,7 +92,7 @@ function createInvoiceLineItem(invoiceIDfk, lineItems) {
           var lineDescription = lineItem.lineDescription;
           var lineAmount = lineItem.lineAmount;
           var invoiceLineFkId = invoiceIDfk;
-          console.log('Before inserting line item: ', lineItemID, lineDescription, lineAmount);
+          console.log('Before inserting invoice line item: ', invoiceLineFkId, lineItemID, lineDescription, lineAmount);
           var post = {
                       lineItemID: lineItemID,
                       lineDescription: lineDescription,
@@ -104,7 +104,6 @@ function createInvoiceLineItem(invoiceIDfk, lineItems) {
               function(err, result) {
                 if (err) reject(err);
                 resolve(200);
-                //res.send('Invoice line item added to database with ID: ' + result.insertId);
               });
           console.log("Invoice line item query: ", query.sql);
     });
